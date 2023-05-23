@@ -1,24 +1,40 @@
 <template>
+  {{ windowHeight }}
   <div class="screen">
-    <div
-      class="screen__inner"
-      :style="{
-        width: `${
-          ((((920 - 16 * 4) / Math.sqrt(cardsContext.length)) * 3) / 4 + 16) *
-          Math.sqrt(cardsContext.length)
-        }px`,
-      }"
-    >
-      <card-flip
-        v-for="(card, index) in cardsContext"
-        :key="index"
-        :ref="`card-${index}`"
-        :imgBackFaceUrl="`images/${card}.png`"
-        :cardsContext="cardsContext"
-        :rules="this.rules"
-        :card="{ index, value: card }"
-        @onFlip="checkRule($event)"
-      />
+    <div class="flex justify-center items-center md:h-auto h-full">
+      <div
+        class="screen__inner"
+        :style="{
+          width: `${
+            ((((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+              Math.sqrt(cardsContext.length)) *
+              3) /
+              4 +
+              16) *
+            Math.sqrt(cardsContext.length)
+          }px`,
+          height: `${
+            ((((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+              Math.sqrt(cardsContext.length)) *
+              3) /
+              4 +
+              16) *
+            Math.sqrt(cardsContext.length)
+          }px`,
+        }"
+      >
+        <card-flip
+          v-for="(card, index) in cardsContext"
+          :key="index"
+          :ref="`card-${index}`"
+          :imgBackFaceUrl="`images/${card}.png`"
+          :cardsContext="cardsContext"
+          :windowHeight="windowHeight"
+          :rules="this.rules"
+          :card="{ index, value: card }"
+          @onFlip="checkRule($event)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -33,6 +49,12 @@ export default {
         return [];
       },
     },
+    windowHeight: {
+      type: Number,
+      default: function () {
+        return 992;
+      },
+    },
   },
   components: {
     cardFlip,
@@ -45,6 +67,7 @@ export default {
   },
   methods: {
     checkRule(card) {
+      console.log(this.windowHeight);
       if (this.rules.length === 2) return;
 
       this.rules.push(card);
@@ -89,6 +112,6 @@ export default {
   /* width: 424px; */
   display: flex;
   flex-wrap: wrap;
-  margin: 2rem auto;
+  margin: auto;
 }
 </style>

@@ -3,6 +3,7 @@
   <interact-screen
     v-if="statusMatch === 'match'"
     :cardsContext="settings.cardsContext"
+    :windowHeight="settings.windowHeight"
     @onFinish="onGetResult"
   />
   <result-screen
@@ -28,6 +29,7 @@ export default {
     return {
       settings: {
         totalOfBlocks: 0,
+        windowHeight: 0,
         cardsContext: [],
         startedAt: null,
       },
@@ -37,7 +39,7 @@ export default {
   },
   methods: {
     onHandleBeforeStart(config) {
-      console.log(this.settings.cardsContext);
+      this.settings.windowHeight = config.windowHeight;
       this.settings.totalOfBlocks = config.totalOfBlocks;
       const firstCard = Array.from(
         { length: this.settings.totalOfBlocks / 2 },

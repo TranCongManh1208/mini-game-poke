@@ -3,8 +3,16 @@
     class="card"
     :class="{ disabled: isDisabled }"
     :style="{
-      height: `${(920 - 16 * 4) / Math.sqrt(cardsContext.length)}px`,
-      width: `${(((920 - 16 * 4) / Math.sqrt(cardsContext.length)) * 3) / 4}px`,
+      height: `${
+        (windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+        Math.sqrt(cardsContext.length)
+      }px`,
+      width: `${
+        (((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+          Math.sqrt(cardsContext.length)) *
+          3) /
+        4
+      }px`,
     }"
   >
     <div
@@ -17,10 +25,24 @@
           class="card__content"
           :style="{
             backgroundSize: `${
-              (((920 - 16 * 4) / Math.sqrt(cardsContext.length)) * 3) / 4 / 3
-            }px ${(((920 - 16 * 4) / Math.sqrt(cardsContext.length)) * 3) / 4 / 3}px`,
+              (((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+                Math.sqrt(cardsContext.length)) *
+                3) /
+              4 /
+              3
+            }px ${
+              (((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+                Math.sqrt(cardsContext.length)) *
+                3) /
+              4 /
+              3
+            }px`,
             perspective: `${
-              (((920 - 16 * 4) / Math.sqrt(cardsContext.length)) * 3) / 4 / 2
+              (((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
+                Math.sqrt(cardsContext.length)) *
+                3) /
+              4 /
+              2
             }px`,
           }"
         ></div>
@@ -52,6 +74,12 @@ export default {
         return [];
       },
     },
+    windowHeight: {
+      type: Number,
+      default: function () {
+        return 992;
+      },
+    },
     rules: {
       type: Array,
       default: function () {
@@ -75,7 +103,6 @@ export default {
   },
   methods: {
     onToggleFlipCard() {
-      console.log(this.rules);
       if (this.isDisabled || this.rules.length == 2) return;
 
       this.rules.length == 2

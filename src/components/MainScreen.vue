@@ -1,8 +1,8 @@
 <template>
   <div class="screen">
-    <h1>POKE MEMORIES</h1>
+    <h1 class="md:text-7xl text-4xl">POKE MEMORIES</h1>
     <h3>Select mode to start game</h3>
-    <div class="modes">
+    <div class="modes grid grid-cols-2 md:grid-cols-4 gap-4">
       <button @click="onStart(16)">
         <span>4x4</span>
         <span>Easy</span>
@@ -25,9 +25,20 @@
 
 <script>
 export default {
+  data() {
+    return {
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+    };
+  },
   methods: {
     onStart(totalOfBlocks) {
-      this.$emit("onStart", { totalOfBlocks });
+      console.log(this.windowWidth, "height");
+      this.$emit("onStart", {
+        totalOfBlocks,
+        windowHeight:
+          this.windowHeight >= this.windowWidth ? this.windowWidth : this.windowHeight,
+      });
     },
   },
 };
@@ -49,20 +60,21 @@ export default {
   color: var(--light);
 }
 .screen h1 {
-  font-size: 4.5rem;
+  /* font-size: 4.5rem; */
   text-transform: uppercase;
 }
 .screen p {
   font-size: 2rem;
 }
 .modes {
-  display: flex;
+  /* display: flex; */
   margin-top: 2rem;
 }
 .modes button {
   font: var(--font);
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
   background: transparent;
   box-shadow: none;
   border: 1px solid var(--light);
@@ -70,7 +82,7 @@ export default {
   display: flex;
   flex-direction: column;
   border-radius: 1rem;
-  margin: 0 1rem;
+  /* margin: 0 1rem; */
   align-items: center;
   justify-content: center;
   cursor: pointer;

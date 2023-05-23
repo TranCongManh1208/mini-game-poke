@@ -1,7 +1,7 @@
 <template>
   <div class="screen">
-    <h1>✨ Congratulations ✨</h1>
-    <h3>{{ Math.round(timer / 1000) }} seconds</h3>
+    <h1 class="md:text-7xl text-5xl">✨ Congratulations ✨</h1>
+    <h3 class="text-4xl">{{ Math.round(timer / 1000) }} seconds</h3>
     <button @click="onStartAgain">Start Again</button>
   </div>
 </template>
@@ -37,12 +37,12 @@ export default {
   justify-content: center;
   flex-direction: column;
 }
-.screen h1 {
+/* .screen h1 {
   font-size: 5rem;
-}
+} */
 .screen h3 {
   margin-top: 1.5rem;
-  font-size: 3rem;
+  /* font-size: 3rem; */
 }
 .screen button {
   font: var(--font);

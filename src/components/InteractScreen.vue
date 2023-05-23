@@ -81,7 +81,7 @@ export default {
         if (this.quantityItem * 2 === this.cardsContext.length) {
           setTimeout(() => {
             this.$emit("onFinish");
-          }, 1000);
+          }, 800);
         }
       } else if (this.rules.length == 2 && this.rules[0].value !== this.rules[1].value) {
         console.log("Wrong...");

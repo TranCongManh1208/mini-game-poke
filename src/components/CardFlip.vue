@@ -20,7 +20,7 @@
       :class="{ 'is-flipped': isFlipped }"
       @click="onToggleFlipCard()"
     >
-      <div class="card__face card__face--front">
+      <div class="card__face card__face--front md:p-3 p-1.5">
         <div
           class="card__content"
           :style="{
@@ -47,7 +47,7 @@
           }"
         ></div>
       </div>
-      <div class="card__face card__face--back">
+      <div class="card__face card__face--back md:p-3 p-1.5">
         <div
           class="card__content"
           :style="{ backgroundImage: `url(${require('@/assets/' + imgBackFaceUrl)})` }"
@@ -149,7 +149,7 @@ export default {
   backface-visibility: hidden;
   overflow: hidden;
   border-radius: 1rem;
-  padding: 1rem;
+  /* padding: 1rem; */
   box-shadow: 0 3px 10px 3px rgb(0, 0, 0, 0.2);
 }
 

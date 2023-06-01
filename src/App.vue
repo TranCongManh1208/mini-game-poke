@@ -1,63 +1,35 @@
 <template>
-  <main-screen v-if="statusMatch === 'default'" @onStart="onHandleBeforeStart($event)" />
-  <interact-screen
-    v-if="statusMatch === 'match'"
-    :cardsContext="settings.cardsContext"
-    :windowHeight="settings.windowHeight"
-    @onFinish="onGetResult"
-  />
-  <result-screen
-    v-if="statusMatch === 'result'"
-    :timer="timer"
-    @onStartAgain="statusMatch = 'default'"
-  />
+  <router-view />
 </template>
 
 <script>
-import MainScreen from "./components/MainScreen.vue";
-import InteractScreen from "./components/InteractScreen.vue";
-import ResultScreen from "./components/ResultScreen.vue";
-import { shuffled } from "../src/utils/array";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { firebaseConfig } from "./configs/firebase";
+
 export default {
   name: "App",
-  components: {
-    MainScreen,
-    InteractScreen,
-    ResultScreen,
-  },
-  data() {
-    return {
-      settings: {
-        totalOfBlocks: 0,
-        windowHeight: 0,
-        cardsContext: [],
-        startedAt: null,
-      },
-      statusMatch: "default",
-      timer: 0,
-    };
-  },
-  methods: {
-    onHandleBeforeStart(config) {
-      this.settings.windowHeight = config.windowHeight;
-      this.settings.totalOfBlocks = config.totalOfBlocks;
-      const firstCard = Array.from(
-        { length: this.settings.totalOfBlocks / 2 },
-        (_, i) => i + 1
-      );
-      const secondCard = [...firstCard];
-      const cards = [...firstCard, ...secondCard];
-      this.settings.cardsContext = shuffled(shuffled(shuffled(shuffled(cards))));
-      this.settings.startedAt = new Date().getTime();
-      console.log(this.settings.startedAt);
-      this.statusMatch = "match";
-    },
-
-    onGetResult() {
-      this.timer = new Date().getTime() - this.settings.startedAt;
-      this.statusMatch = "result";
-      console.log(this.timer);
-    },
+  setup() {
+    initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const store = useStore();
+    const router = useRouter();
+    onAuthStateChanged(auth, async () => {
+      store.commit("setUser", auth.currentUser);
+      if (
+        router.currentRoute.value.name !== "Profile" &&
+        router.currentRoute.value.name !== "SignIn" &&
+        router.currentRoute.value.name !== "SignUp"
+      ) {
+        router.push({
+          name: `${auth.currentUser !== null ? "Match" : "SignIn"}`,
+          params: {},
+        });
+      }
+      console.log("auth", auth.currentUser);
+    });
   },
 };
 </script>

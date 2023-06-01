@@ -1,9 +1,8 @@
 <template>
-  {{ windowHeight }}
-  <div class="screen">
+  <div class="screen w-full h-screen absolute top-0 left-0 bg-dark text-light">
     <div class="flex justify-center items-center md:h-auto h-full">
       <div
-        class="screen__inner"
+        class="screen__inner flex flex-wrap m-auto"
         :style="{
           width: `${
             ((((windowHeight - 16 * Math.sqrt(cardsContext.length)) /
@@ -40,24 +39,15 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import { useRouter } from "vue-router";
 import cardFlip from "./CardFlip.vue";
 export default {
-  props: {
-    cardsContext: {
-      type: Array,
-      default: function () {
-        return [];
-      },
-    },
-    windowHeight: {
-      type: Number,
-      default: function () {
-        return 992;
-      },
-    },
-  },
   components: {
     cardFlip,
+  },
+  computed: {
+    ...mapGetters(["cardsContext", "windowHeight"]),
   },
   data() {
     return {
@@ -66,11 +56,16 @@ export default {
     };
   },
   methods: {
-    checkRule(card) {
-      console.log(this.windowHeight);
+    checkEmptyCard() {
+      const router = useRouter();
+      if (this.cardsContext.length == 0) {
+        router.push({ name: "Match", params: {} });
+      }
+    },
+    checkRule(data) {
       if (this.rules.length === 2) return;
 
-      this.rules.push(card);
+      data.isFlipped.value ? this.rules.push(data.card) : (this.rules = []);
 
       if (this.rules.length == 2 && this.rules[0].value === this.rules[1].value) {
         console.log("Right...");
@@ -80,13 +75,12 @@ export default {
         this.quantityItem += 1;
         if (this.quantityItem * 2 === this.cardsContext.length) {
           setTimeout(() => {
-            this.$emit("onFinish");
+            this.$router.push({ name: "Result", params: {} });
           }, 800);
         }
       } else if (this.rules.length == 2 && this.rules[0].value !== this.rules[1].value) {
         console.log("Wrong...");
         setTimeout(() => {
-          console.log(this.cardsContext);
           this.$refs[`card-${this.rules[0].index}`][0].onFlipBackCard();
           this.$refs[`card-${this.rules[1].index}`][0].onFlipBackCard();
           this.rules = [];
@@ -94,24 +88,8 @@ export default {
       } else return;
     },
   },
+  created: function () {
+    this.checkEmptyCard();
+  },
 };
 </script>
-
-<style lang="css" scoped>
-.screen {
-  width: 100%;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: var(--dark);
-  color: var(--light);
-}
-
-.screen__inner {
-  /* width: 424px; */
-  display: flex;
-  flex-wrap: wrap;
-  margin: auto;
-}
-</style>

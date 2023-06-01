@@ -1,103 +1,146 @@
 <template>
-  <div class="screen">
-    <h1 class="md:text-7xl text-4xl">POKE MEMORIES</h1>
-    <h3>Select mode to start game</h3>
-    <div class="modes grid grid-cols-2 md:grid-cols-4 gap-4">
-      <button @click="onStart(16)">
-        <span>4x4</span>
-        <span>Easy</span>
+  <div class="flex items-center justify-end me-5 relative z-10">
+    <div class="profile top-3 right-3 cursor-pointer">
+      <div class="profile__name flex justify-end items-center">
+        <img
+          class="w-12 h-12 rounded-t-full"
+          src="../assets/images/10.png"
+          alt="Pancake"
+        />
+        <span class="text-light text-3xl ms-3">{{ nameCurrentUser }}</span>
+      </div>
+      <div class="profile__nav absolute w-[200px] right-0">
+        <ul>
+          <li class="text-light text-2xl text-right">
+            <router-link :to="{ name: 'Profile', params: {} }" class="decoration-clone"
+              >View Profile</router-link
+            >
+          </li>
+          <li class="text-light text-2xl text-right">
+            <router-link :to="{ name: 'Logout', params: {} }" class="decoration-clone"
+              >Logout</router-link
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div
+    class="screen w-full h-screen absolute top-0 left-0 flex justify-center items-center flex-col z-[2] bg-dark text-light"
+  >
+    <h1 class="md:text-7xl text-4xl uppercase">POKE MEMORIES</h1>
+    <h3 class="text-4xl">Select mode to start game</h3>
+    <div class="modes grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+      <button
+        class="w-full h-full p-8 flex flex-col justify-center items-center rounded-2xl cursor-pointer bg-transparent shadow-none text-light border border-light"
+        @click="onStart(16)"
+      >
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">4x4</span>
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">Easy</span>
       </button>
-      <button @click="onStart(36)">
-        <span>6x6</span>
-        <span>Normal</span>
+      <button
+        class="w-full h-full p-8 flex flex-col justify-center items-center rounded-2xl cursor-pointer bg-transparent shadow-none text-light border border-light"
+        @click="onStart(36)"
+      >
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">6x6</span>
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">Normal</span>
       </button>
-      <button @click="onStart(64)">
-        <span>8x8</span>
-        <span>Hard</span>
+      <button
+        class="w-full h-full p-8 flex flex-col justify-center items-center rounded-2xl cursor-pointer bg-transparent shadow-none text-light border border-light"
+        @click="onStart(64)"
+      >
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">8x8</span>
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">Hard</span>
       </button>
-      <button @click="onStart(100)">
-        <span>10x10</span>
-        <span>Super Hard</span>
+      <button
+        class="w-full h-full p-8 flex flex-col justify-center items-center rounded-2xl cursor-pointer bg-transparent shadow-none text-light border border-light"
+        @click="onStart(100)"
+      >
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">10x10</span>
+        <span class="first:text-3xl last:block last:text-xl last:mt-2">Super Hard</span>
       </button>
     </div>
   </div>
 </template>
 
 <script>
+import { useStore } from "vuex";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { collection, getDocs } from "firebase/firestore";
+import { shuffled } from "../utils/array";
+import { db } from "@/configs/firebase";
 export default {
-  data() {
-    return {
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
-    };
-  },
-  methods: {
-    onStart(totalOfBlocks) {
-      console.log(this.windowWidth, "height");
-      this.$emit("onStart", {
-        totalOfBlocks,
-        windowHeight:
-          this.windowHeight >= this.windowWidth ? this.windowWidth : this.windowHeight,
+  setup() {
+    const router = useRouter();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const cardsContext = ref([]);
+    const startedAt = ref(null);
+    const store = useStore();
+
+    function onStart(totalOfBlocks) {
+      const firstCard = Array.from({ length: totalOfBlocks / 2 }, (_, i) => i + 1);
+      const secondCard = [...firstCard];
+      const cards = [...firstCard, ...secondCard];
+      cardsContext.value = shuffled(shuffled(shuffled(shuffled(cards))));
+      startedAt.value = new Date().getTime();
+
+      store.commit("setTotalOfBlocks", totalOfBlocks);
+      store.commit("setCardsContext", cardsContext.value);
+      store.commit("setStartedAt", startedAt.value);
+      store.commit(
+        "setWindowHeight",
+        windowHeight >= windowWidth ? windowWidth : windowHeight
+      );
+      router.push({ name: "Interact", params: {} });
+    }
+
+    const auth = getAuth();
+    let nameCurrentUser = ref("");
+
+    onAuthStateChanged(auth, async () => {
+      if (auth.currentUser !== null) nameCurrentUser.value = auth.currentUser.displayName;
+      console.log("auth", auth.currentUser);
+    });
+
+    console.log(nameCurrentUser);
+
+    const testFirestore = async () => {
+      const querySnapshot = await getDocs(collection(db, "product"));
+      console.log("querySnapshot", querySnapshot);
+      querySnapshot.forEach((doc) => {
+        console.log(doc.data());
       });
-    },
+    };
+    testFirestore();
+    return { nameCurrentUser, onStart };
   },
 };
 </script>
 
 <style lang="css" scoped>
-.screen {
-  width: 100%;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  background-color: var(--dark);
-  color: var(--light);
-}
-.screen h1 {
-  /* font-size: 4.5rem; */
-  text-transform: uppercase;
-}
-.screen p {
-  font-size: 2rem;
-}
-.modes {
-  /* display: flex; */
-  margin-top: 2rem;
-}
 .modes button {
   font: var(--font);
-  width: 100%;
-  height: 100%;
-  padding: 1rem;
-  background: transparent;
-  box-shadow: none;
-  border: 1px solid var(--light);
-  color: var(--light);
-  display: flex;
-  flex-direction: column;
-  border-radius: 1rem;
-  /* margin: 0 1rem; */
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
   transition: background 0.3s ease-in-out;
 }
 .modes button:hover {
   background-color: var(--light);
   color: var(--dark);
 }
-.modes button span:first-child {
-  font-size: 2rem;
+.profile {
+  width: max-content;
+  left: calc(100% - 240px);
 }
-.modes button span:last-child {
-  display: block;
-  font-size: 1.25rem;
-  margin-top: 0.5rem;
+.profile__nav {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s;
+}
+
+.profile:hover .profile__nav {
+  opacity: 1;
+  visibility: visible;
 }
 </style>

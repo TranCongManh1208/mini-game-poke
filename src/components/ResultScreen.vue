@@ -1,60 +1,46 @@
 <template>
-  <div class="screen">
+  <div
+    class="screen w-full h-screen absolute top-0 left-0 z-[2] bg-dark text-light flex justify-center items-center flex-col"
+  >
     <h1 class="md:text-7xl text-5xl">✨ Congratulations ✨</h1>
-    <h3 class="text-4xl">{{ Math.round(timer / 1000) }} seconds</h3>
-    <button @click="onStartAgain">Start Again</button>
+    <h3 class="text-4xl mt-6">{{ Math.round(totalTimer / 1000) }} seconds</h3>
+    <button
+      class="font-sans bg-transparent shadow-none border border-light text-light m-4 px-4 py-5 rounded-lg cursor-pointer text-xl"
+      @click="onStartAgain"
+    >
+      Start Again
+    </button>
   </div>
 </template>
 
 <script>
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default {
-  props: {
-    timer: {
-      type: Number,
-      required: true,
-    },
-  },
-  methods: {
-    onStartAgain() {
-      this.$emit("onStartAgain");
-    },
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    let totalTimer = ref(0);
+    console.log(store.getters.startedAt);
+    if (store.getters.startedAt == null) {
+      router.push({ name: "Match", params: {} });
+    } else {
+      totalTimer = computed(() => {
+        return new Date().getTime() - store.getters.startedAt;
+      });
+    }
+    function onStartAgain() {
+      router.push({ name: "Match", params: {} });
+    }
+
+    return { totalTimer, onStartAgain };
   },
 };
 </script>
 
 <style scoped>
-.screen {
-  width: 100%;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  background-color: var(--dark);
-  color: var(--light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-/* .screen h1 {
-  font-size: 5rem;
-} */
-.screen h3 {
-  margin-top: 1.5rem;
-  /* font-size: 3rem; */
-}
 .screen button {
-  font: var(--font);
-  background: transparent;
-  box-shadow: none;
-  border: 1px solid var(--light);
-  color: var(--light);
-  margin: 1rem;
-  padding: 1rem 1.25rem;
-  border-radius: 0.5rem;
-  font-size: 1.25rem;
-  cursor: pointer;
   transition: background 0.3s ease-in-out;
 }
 .screen button:hover {

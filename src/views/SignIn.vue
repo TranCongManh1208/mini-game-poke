@@ -58,6 +58,32 @@
             </span>
           </div>
         </div>
+        <div class="row">
+          <div
+            class="loginWithFacebook flex flex-row my-3 cursor-pointer"
+            @click="onFacebookSignIn"
+          >
+            <div class="w-[40px] text-center bg-[#3b5998] rounded-s-lg py-2">F</div>
+            <div
+              class="uppercase text-center py-2 w-[calc(100%-40px)] rounded-e-lg bg-[#3b5998]"
+            >
+              login with facebook
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="loginWithGoogle flex flex-row my-3 cursor-pointer"
+            @click="onGoogleSignIn"
+          >
+            <div class="w-[40px] text-center bg-[#c72d24] rounded-s-lg py-2">G</div>
+            <div
+              class="uppercase text-center py-2 w-[calc(100%-40px)] rounded-e-lg bg-[#f54537]"
+            >
+              login with google
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -70,15 +96,36 @@ import { useSignIn } from "@/composables/useSignIn";
 export default {
   setup() {
     const router = useRouter();
-    const { error, isPending, signin } = useSignIn();
+    const { error, isPending, signin, googleSignIn, facebookSignIn } = useSignIn();
     const email = ref("");
     const password = ref("");
-    async function onSubmit() {
+
+    const onSubmit = async () => {
       await signin(email.value, password.value);
-      console.log(error.value, "val");
       if (error.value == null) router.push({ name: "Match", params: {} });
-    }
-    return { email, password, error, isPending, onSubmit };
+    };
+
+    const onGoogleSignIn = async () => {
+      await googleSignIn();
+
+      if (error.value == null) router.push({ name: "Match", params: {} });
+    };
+
+    const onFacebookSignIn = async () => {
+      await facebookSignIn();
+
+      if (error.value == null) router.push({ name: "Match", params: {} });
+    };
+
+    return {
+      email,
+      password,
+      error,
+      isPending,
+      onSubmit,
+      onGoogleSignIn,
+      onFacebookSignIn,
+    };
   },
 };
 </script>

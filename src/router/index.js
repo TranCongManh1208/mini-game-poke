@@ -2,6 +2,11 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
     {
+        path: "/:catchAll(.*)",
+        name: "NotFound",
+        component: () => import(/* webpackChunkName: "profile" */ '@/views/ProFile.vue')
+    },
+    {
         path: "/profile",
         name: "Profile",
         component: () => import(/* webpackChunkName: "profile" */ '@/views/ProFile.vue')

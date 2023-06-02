@@ -101,6 +101,7 @@ export default {
     const password = ref("");
 
     const onSubmit = async () => {
+      console.log("email", email);
       await signin(email.value, password.value);
       if (error.value == null) router.push({ name: "Match", params: {} });
     };

@@ -1,12 +1,12 @@
 import { ref } from "vue";
-import { projectAuth } from "@/configs/firebase";
-import { signInWithEmailAndPassword, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { authErrorCode } from "@/utils/authErrorCode";
 
 const error = ref(null);
 const isPending = ref(false);
-const auth = projectAuth();
-const provider = new GoogleAuthProvider();
+const auth = getAuth();
+const providerGG = new GoogleAuthProvider();
+const providerFB = new FacebookAuthProvider();
 
 async function signin(email, password) {
     error.value = null;
@@ -22,23 +22,39 @@ async function signin(email, password) {
     }
 }
 
-function googleSignIn() {
-    signInWithPopup(auth, provider).then(() => {
-        console.log('success')
-    }).catch(err => {
+async function googleSignIn() {
+    try {
+        await signInWithPopup(auth, providerGG).then(() => {
+            console.log('success')
+        })
+    } catch (err) {
         error.value = authErrorCode[err.code];
-    })
+    }
 }
 
-function facebookSignIn() {
-    signInWithPopup(auth, provider).then((result) => {
-        const user = result.user;
-        const credential = FacebookAuthProvider.credentialFromResult(result);
-        const accessToken = credential.accessToken;
-        console.log('success', user, accessToken)
-    }).catch(err => {
+async function facebookSignIn() {
+    try {
+        await signInWithRedirect(auth, providerFB);
+        await getRedirectResult(auth)
+            .then((result) => {
+                // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                const credential = FacebookAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;
+
+                const user = result.user;
+                // IdP data available using getAdditionalUserInfo(result)
+                console.log('credential', token, user);
+                // ...
+            })
+        // await signInWithPopup(auth, providerFB).then((result) => {
+        //     const user = result.user;
+        //     console.log('success', user, accessToken)
+        //     const credential = FacebookAuthProvider.credentialFromResult(result);
+        //     const accessToken = credential.accessToken;
+        // })
+    } catch (err) {
         error.value = authErrorCode[err.code];
-    })
+    }
 }
 
 export function useSignIn() {

@@ -114,7 +114,7 @@ export default {
 
     const onFacebookSignIn = async () => {
       await facebookSignIn();
-
+      console.log("err", error.value);
       if (error.value == null) router.push({ name: "Match", params: {} });
     };
 

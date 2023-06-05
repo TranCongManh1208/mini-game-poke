@@ -3,11 +3,18 @@
     <div class="profile top-3 right-3 cursor-pointer">
       <div class="profile__name flex justify-end items-center">
         <img
+          v-if="currentUser !== null"
+          class="w-12 h-12 rounded-t-full"
+          :src="currentUser.photoURL"
+          :alt="currentUser.displayName"
+        />
+        <img
+          v-else
           class="w-12 h-12 rounded-t-full"
           src="../assets/images/10.png"
-          alt="Pancake"
+          :alt="currentUser.displayName"
         />
-        <span class="text-light text-3xl ms-3">{{ nameCurrentUser }}</span>
+        <span class="text-light text-3xl ms-3">{{ currentUser.displayName }}</span>
       </div>
       <div class="profile__nav absolute w-[200px] right-0">
         <ul>
@@ -98,14 +105,12 @@ export default {
     }
 
     const auth = getAuth();
-    let nameCurrentUser = ref("");
+    let currentUser = ref("");
 
     onAuthStateChanged(auth, async () => {
-      if (auth.currentUser !== null) nameCurrentUser.value = auth.currentUser.displayName;
+      if (auth.currentUser !== null) currentUser.value = auth.currentUser;
       console.log("auth", auth.currentUser);
     });
-
-    console.log(nameCurrentUser);
 
     const testFirestore = async () => {
       const querySnapshot = await getDocs(collection(db, "product"));
@@ -115,7 +120,7 @@ export default {
       });
     };
     testFirestore();
-    return { nameCurrentUser, onStart };
+    return { currentUser, onStart };
   },
 };
 </script>

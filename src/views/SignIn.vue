@@ -25,6 +25,7 @@
                 class="py-2 rounded-lg px-2 text-dark"
                 type="password"
                 autocomplete="current-password"
+                placeholder="......"
                 v-model="password"
               />
             </label>
@@ -93,29 +94,63 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useSignIn } from "@/composables/useSignIn";
+import { toastNotification } from "@/utils/toastNotification";
 export default {
   setup() {
     const router = useRouter();
     const { error, isPending, signin, googleSignIn, facebookSignIn } = useSignIn();
     const email = ref("");
     const password = ref("");
-
     const onSubmit = async () => {
-      console.log("email", email);
       await signin(email.value, password.value);
-      if (error.value == null) router.push({ name: "Match", params: {} });
+      if (error.value == null) {
+        router.push({ name: "Match", params: {} });
+        toastNotification({
+          message: "Successfully SignIn",
+          type: "success",
+          position: "top-right",
+        });
+      } else {
+        toastNotification({ message: error.value, type: "error", position: "top-right" });
+      }
     };
 
     const onGoogleSignIn = async () => {
       await googleSignIn();
 
-      if (error.value == null) router.push({ name: "Match", params: {} });
+      if (error.value == null) {
+        router.push({ name: "Match", params: {} });
+        toastNotification({
+          message: "Successfully SignIn",
+          type: "success",
+          position: "top-right",
+        });
+      } else {
+        toastNotification({
+          message: error.value,
+          type: "error",
+          position: "top-right",
+        });
+      }
     };
 
     const onFacebookSignIn = async () => {
       await facebookSignIn();
-      console.log("err", error.value);
-      if (error.value == null) router.push({ name: "Match", params: {} });
+
+      if (error.value == null) {
+        router.push({ name: "Match", params: {} });
+        toastNotification({
+          message: "Successfully SignIn",
+          type: "success",
+          position: "top-right",
+        });
+      } else {
+        toastNotification({
+          message: error.value,
+          type: "error",
+          position: "top-right",
+        });
+      }
     };
 
     return {

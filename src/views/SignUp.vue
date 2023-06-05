@@ -37,6 +37,7 @@
                 class="text-dark py-2 rounded-lg px-2"
                 type="password"
                 autocomplete="current-password"
+                placeholder="......"
                 v-model="password"
               />
             </label>
@@ -81,6 +82,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useSignUp } from "@/composables/useSignUp";
+import { toastNotification } from "@/utils/toastNotification";
 export default {
   setup() {
     const { toastErr, error, isPending, signup } = useSignUp();
@@ -90,7 +92,17 @@ export default {
     const password = ref("");
     async function onSubmit() {
       await signup(email.value, password.value, fullname.value);
-      if (error.value == null) router.push({ name: "SignIn", params: {} });
+
+      if (error.value == null) {
+        router.push({ name: "Match", params: {} });
+        toastNotification({
+          message: "Successfully SignUp",
+          type: "error",
+          position: "top-right",
+        });
+      } else {
+        toastNotification({ message: error.value, type: "error", position: "top-right" });
+      }
     }
     return { fullname, email, password, toastErr, error, isPending, onSubmit };
   },

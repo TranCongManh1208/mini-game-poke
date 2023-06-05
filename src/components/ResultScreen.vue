@@ -26,9 +26,7 @@ export default {
     if (store.getters.startedAt == null) {
       router.push({ name: "Match", params: {} });
     } else {
-      totalTimer = computed(() => {
-        return new Date().getTime() - store.getters.startedAt;
-      });
+      totalTimer = computed(() => new Date().getTime() - store.getters.startedAt);
     }
     function onStartAgain() {
       router.push({ name: "Match", params: {} });

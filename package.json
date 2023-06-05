@@ -12,6 +12,7 @@
         "firebase": "^9.22.1",
         "vue": "^3.2.13",
         "vue-router": "4",
+        "vue-toast-notification": "^3.0",
         "vuex": "^4.0.2"
     },
     "devDependencies": {

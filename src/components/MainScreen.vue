@@ -75,17 +75,57 @@ import { useStore } from "vuex";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { shuffled } from "../utils/array";
 import { db } from "@/configs/firebase";
 export default {
   setup() {
     const router = useRouter();
+    const store = useStore();
+    const auth = getAuth();
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const cardsContext = ref([]);
     const startedAt = ref(null);
-    const store = useStore();
+    let currentUser = ref("");
+
+    const setAchievements = async (uid, mid) => {
+      try {
+        const docRef = await addDoc(collection(db, "achievements"), {
+          uid: uid,
+          mid: mid,
+          modes: [
+            {
+              id: 16,
+              mode: "4x4",
+              timer: 0,
+              date: "20/10/2020",
+            },
+            {
+              id: 36,
+              mode: "6x6",
+              timer: 0,
+              date: "20/10/2020",
+            },
+            {
+              id: 64,
+              mode: "8x8",
+              timer: 0,
+              date: "20/10/2020",
+            },
+            {
+              id: 100,
+              mode: "10x10",
+              timer: 0,
+              date: "20/10/2020",
+            },
+          ],
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+    };
 
     function onStart(totalOfBlocks) {
       const firstCard = Array.from({ length: totalOfBlocks / 2 }, (_, i) => i + 1);
@@ -101,25 +141,15 @@ export default {
         "setWindowHeight",
         windowHeight >= windowWidth ? windowWidth : windowHeight
       );
+      setAchievements(auth.currentUser.uid, totalOfBlocks);
+      console.log("currentUser", auth.currentUser);
       router.push({ name: "Interact", params: {} });
     }
 
-    const auth = getAuth();
-    let currentUser = ref("");
-
     onAuthStateChanged(auth, async () => {
       if (auth.currentUser !== null) currentUser.value = auth.currentUser;
-      console.log("auth", auth.currentUser);
     });
 
-    const testFirestore = async () => {
-      const querySnapshot = await getDocs(collection(db, "product"));
-      console.log("querySnapshot", querySnapshot);
-      querySnapshot.forEach((doc) => {
-        console.log(doc.data());
-      });
-    };
-    testFirestore();
     return { currentUser, onStart };
   },
 };

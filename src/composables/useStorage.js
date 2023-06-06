@@ -12,6 +12,7 @@ const useStorage = (name) => {
     const url = ref(user.value.photoURL);
 
     async function uploadFile(file) {
+        if (!file.name) return url.value = file;
         filePath.value = `${name}/${user.value.uid}/${file.name}`;
         const fileRef = storageRef(storage, filePath.value);
         // const fileRef = storageRef(filePath.value);

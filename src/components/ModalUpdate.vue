@@ -149,7 +149,6 @@ export default {
       if (selected && typesFile.includes(selected.type)) {
         file.value = selected;
         filePreview.value = window.URL.createObjectURL(selected);
-        console.log("selected", window.URL.createObjectURL(selected));
       } else {
         file.value = null;
         errorFile.value = "The file is in the wrong data format.";

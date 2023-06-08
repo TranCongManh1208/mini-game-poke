@@ -8,7 +8,7 @@
       <div class="relative bg-light rounded-lg shadow dark:bg-gray-700">
         <button
           type="button"
-          @click="$emit('onIsShow', false)"
+          @click="$emit('onModal', false)"
           class="absolute top-3 right-2.5 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
           data-modal-hide="authentication-modal"
         >
@@ -175,7 +175,7 @@ export default {
         position: "top-right",
       });
       isPending.value = false;
-      emit("onIsShow", false);
+      emit("onModal", false);
     }
     return {
       user,

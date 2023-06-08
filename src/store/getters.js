@@ -5,4 +5,5 @@ export default {
     cardsContext: state => state.cardsContext,
     timer: state => state.timer,
     user: state => state.user,
+    achievements: state => state.achievements,
 }

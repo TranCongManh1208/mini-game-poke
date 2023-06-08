@@ -17,4 +17,7 @@ export default {
     setUser(state, user) {
         state.user = user;
     },
+    setAchievements(state, achievements) {
+        state.achievements = achievements;
+    },
 }

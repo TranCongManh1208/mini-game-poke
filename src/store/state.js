@@ -5,4 +5,5 @@ export default {
     cardsContext: [],
     timer: 0,
     user: null,
+    achievements: [],
 }

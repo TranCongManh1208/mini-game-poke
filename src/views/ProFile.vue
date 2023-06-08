@@ -41,8 +41,27 @@
           JSON.stringify(new Date(user.metadata.creationTime)).slice(1, 11)
         }}</span>
       </div>
-      <div class="text-2xl py-1 cursor-pointer profile-achievements">
-        <span>Achievements</span>
+      <div
+        class="text-2xl py-1 cursor-pointer profile-achievements"
+        v-if="state.achievements.length !== 0"
+      >
+        <span @click="onAchievements">Achievements</span>
+        <ul class="ps-4 py-2" v-if="isAchievements">
+          <li v-for="mode in state.achievements.modes" :key="mode.id" class="list-disc">
+            <div>Mode: {{ mode.mode }}</div>
+            <div class="ps-3 text-base">
+              Perfect time:
+              {{
+                mode.timer !== 0
+                  ? `${Math.round(mode.timer / 1000)} seconds`
+                  : "No achievements"
+              }}
+            </div>
+            <div class="ps-3 text-base">
+              Date created: {{ mode.date !== 0 ? mode.date : "No date created" }}
+            </div>
+          </li>
+        </ul>
       </div>
       <div class="text-2xl py-1 cursor-pointer profile-logout">
         <span>
@@ -58,18 +77,22 @@
           ></span
         >
       </div>
-      <div class="update__profile my-3" @click="onShowModal">
+      <div class="update__profile my-3" @click="onModal(true)">
         <button class="bg-CornflowerBlue w-full py-2 rounded-lg text-lg">
           Update Profile
         </button>
       </div>
     </div>
   </div>
-  <modal-update v-if="isShow" @onIsShow="onIsShow(value)" />
+  <modal-update v-if="isShow" @onModal="onModal(value)" />
 </template>
 
 <script>
 import { ref } from "vue";
+import { useStore } from "vuex";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "@/configs/firebase";
 import modalUpdate from "../components/ModalUpdate.vue";
 import { useUser } from "../composables/useUser";
 export default {
@@ -77,16 +100,42 @@ export default {
     modalUpdate,
   },
   setup() {
+    const auth = getAuth();
+    const store = useStore();
     const { getUser } = useUser();
     const { user } = getUser();
     const isShow = ref(false);
-    const onShowModal = () => {
-      isShow.value = !isShow.value;
-    };
-    const onIsShow = (value) => {
+    const isAchievements = ref(false);
+
+    const onModal = (value) => {
       isShow.value = value;
     };
-    return { user, isShow, onShowModal, onIsShow };
+
+    const onAchievements = () => {
+      isAchievements.value = !isAchievements.value;
+    };
+
+    onAuthStateChanged(auth, async (_user) => {
+      try {
+        const querySnapshot = await getDoc(doc(db, "achievements", _user.uid));
+        console.log("querySnapshot.data()", querySnapshot.data());
+        if (querySnapshot.data()) {
+          store.commit("setAchievements", querySnapshot.data().achievements);
+          console.log("modes: ", store.state.achievements.modes);
+        }
+      } catch (err) {
+        console.log(err, "err");
+      }
+    });
+
+    return {
+      user,
+      isShow,
+      state: store.state,
+      isAchievements,
+      onAchievements,
+      onModal,
+    };
   },
 };
 </script>

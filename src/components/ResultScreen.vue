@@ -78,14 +78,14 @@ export default {
       }
     };
 
-    onAuthStateChanged(auth, async () => {
-      await updateAchievements(auth.currentUser.uid);
-      await handleAchievements(auth.currentUser.uid);
+    onAuthStateChanged(auth, async (_user) => {
+      await updateAchievements(_user.uid);
+      await handleAchievements(_user.uid);
     });
 
     async function onStartAgain(uid) {
-      const querySnap = await getDoc(doc(db, "achievements", uid));
-      await updateDoc(doc(db, "achievements", querySnap.data().achievements.uid), {
+      const querySnapshot = await getDoc(doc(db, "achievements", uid));
+      await updateDoc(doc(db, "achievements", querySnapshot.data().achievements.uid), {
         "achievements.startTime": 0,
         "achievements.endTime": 0,
         "achievements.complete": false,

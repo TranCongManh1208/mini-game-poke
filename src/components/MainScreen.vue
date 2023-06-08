@@ -75,9 +75,10 @@ import { useStore } from "vuex";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { shuffled } from "../utils/array";
 import { db } from "@/configs/firebase";
+import achievementses from "@/utils/addDoc";
 export default {
   setup() {
     const router = useRouter();
@@ -90,43 +91,24 @@ export default {
     let currentUser = ref("");
 
     const setAchievements = async (uid, mid) => {
-      try {
-        const docRef = await addDoc(collection(db, "achievements"), {
-          uid: uid,
-          mid: mid,
-          modes: [
-            {
-              id: 16,
-              mode: "4x4",
-              timer: 0,
-              date: "20/10/2020",
-            },
-            {
-              id: 36,
-              mode: "6x6",
-              timer: 0,
-              date: "20/10/2020",
-            },
-            {
-              id: 64,
-              mode: "8x8",
-              timer: 0,
-              date: "20/10/2020",
-            },
-            {
-              id: 100,
-              mode: "10x10",
-              timer: 0,
-              date: "20/10/2020",
-            },
-          ],
-        });
-        console.log("Document written with ID: ", docRef.id);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
+      const { achievements } = achievementses(uid, mid);
+      await setDoc(doc(db, "achievements", uid), { achievements });
     };
 
+    const getAchievements = async (uid, mid) => {
+      const querySnapshot = await getDoc(doc(db, "achievements", uid));
+      console.log("querySnapshot", querySnapshot.data());
+      if (!querySnapshot.data()) {
+        setAchievements(uid, mid);
+      } else {
+        await updateDoc(doc(db, "achievements", querySnapshot.data().achievements.uid), {
+          "achievements.mid": mid,
+          "achievements.startTime": new Date().getTime(),
+          "achievements.endTime": 0,
+          "achievements.complete": false,
+        });
+      }
+    };
     function onStart(totalOfBlocks) {
       const firstCard = Array.from({ length: totalOfBlocks / 2 }, (_, i) => i + 1);
       const secondCard = [...firstCard];
@@ -141,7 +123,7 @@ export default {
         "setWindowHeight",
         windowHeight >= windowWidth ? windowWidth : windowHeight
       );
-      setAchievements(auth.currentUser.uid, totalOfBlocks);
+      getAchievements(auth.currentUser.uid, totalOfBlocks);
       console.log("currentUser", auth.currentUser);
       router.push({ name: "Interact", params: {} });
     }

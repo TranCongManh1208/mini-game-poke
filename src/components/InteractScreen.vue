@@ -41,6 +41,9 @@
 <script>
 import { mapGetters } from "vuex";
 import { useRouter } from "vue-router";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { db } from "@/configs/firebase";
 import cardFlip from "./CardFlip.vue";
 export default {
   components: {
@@ -62,7 +65,8 @@ export default {
         router.push({ name: "Match", params: {} });
       }
     },
-    checkRule(data) {
+    async checkRule(data) {
+      const auth = getAuth();
       if (this.rules.length === 2) return;
 
       data.isFlipped.value ? this.rules.push(data.card) : (this.rules = []);
@@ -74,6 +78,10 @@ export default {
         this.rules = [];
         this.quantityItem += 1;
         if (this.quantityItem * 2 === this.cardsContext.length) {
+          const querySnap = await getDoc(doc(db, "achievements", auth.currentUser.uid));
+          await updateDoc(doc(db, "achievements", querySnap.data().achievements.uid), {
+            "achievements.complete": true,
+          });
           setTimeout(() => {
             this.$router.push({ name: "Result", params: {} });
           }, 800);

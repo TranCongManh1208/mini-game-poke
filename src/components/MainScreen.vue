@@ -35,7 +35,12 @@
   <div
     class="screen w-full h-screen absolute top-0 left-0 flex justify-center items-center flex-col z-[2] bg-dark text-light"
   >
-    <h1 class="md:text-7xl text-4xl uppercase">POKE MEMORIES</h1>
+    <h1 class="md:text-7xl text-4xl uppercase w-1/3">
+      <img
+        src="http://fc00.deviantart.net/fs70/i/2012/308/0/b/__hd___pokemon_logo___hd___by_peetzaahhh2010-d5k08gz.png"
+        alt="Pancake"
+      />
+    </h1>
     <h3 class="text-4xl">Select mode to start game</h3>
     <div class="modes grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
       <button
@@ -71,14 +76,17 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
 import { ref } from "vue";
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { shuffled } from "../utils/array";
 import { db } from "@/configs/firebase";
 import achievementses from "@/utils/addDoc";
+// import playMusic from "@/utils/audios";
+// import audioMain from "@/assets/audios/2.mp3";
+
 export default {
   setup() {
     const router = useRouter();
@@ -97,7 +105,6 @@ export default {
 
     const getAchievements = async (uid, mid) => {
       const querySnapshot = await getDoc(doc(db, "achievements", uid));
-      console.log("querySnapshot", querySnapshot.data());
       if (!querySnapshot.data()) {
         setAchievements(uid, mid);
       } else {
@@ -124,13 +131,15 @@ export default {
         windowHeight >= windowWidth ? windowWidth : windowHeight
       );
       getAchievements(auth.currentUser.uid, totalOfBlocks);
-      console.log("currentUser", auth.currentUser);
       router.push({ name: "Interact", params: {} });
     }
 
     onAuthStateChanged(auth, async () => {
+      // audio.play();
       if (auth.currentUser !== null) currentUser.value = auth.currentUser;
     });
+    // console.log(audioMain);
+    // playMusic(audioMain);
 
     return { currentUser, onStart };
   },

@@ -2,10 +2,17 @@
   <div
     class="screen w-full h-screen absolute top-0 left-0 z-[2] bg-dark text-light flex justify-center items-center flex-col"
   >
-    <h1 class="md:text-7xl text-5xl">✨ Congratulations ✨</h1>
-    <h3 class="text-4xl mt-6">{{ store.state.timer }} seconds</h3>
+    <div class="fireworks absolute w-full h-screen -z-10" v-if="isFirework">
+      <div class="fireworks__inner">
+        <div class="before"></div>
+        <div class="after"></div>
+      </div>
+      <!-- <div class="circle-tunes"></div> -->
+    </div>
+    <h1 class="md:text-7xl text-lg">✨ Congratulations ✨</h1>
+    <h3 class="text-5xl my-3">{{ store.state.timer }} seconds</h3>
     <button
-      class="font-sans bg-transparent shadow-none border border-light text-light m-4 px-4 py-5 rounded-lg cursor-pointer text-xl"
+      class="font-sans bg-transparent shadow-none border border-light text-light rounded-lg cursor-pointer mt-[.1rem] px-3 py-2 text-2xl"
       @click="onStartAgain(auth.currentUser.uid)"
     >
       Start Again
@@ -26,6 +33,7 @@ export default {
     const router = useRouter();
     const store = useStore();
     const auth = getAuth();
+    const isFirework = ref(false);
     let totalTimer = ref(store.state.timer);
 
     const updateAchievements = async (uid) => {
@@ -63,6 +71,9 @@ export default {
               mode.timer <= 0 || totalTimer.value < mode.timer
                 ? toISOString(new Date())
                 : mode.date;
+            mode.timer <= 0 || totalTimer.value < mode.timer
+              ? (isFirework.value = true)
+              : (isFirework.value = false);
             newModes.push({ ...mode, timer: newTimer, date: newDate });
           } else {
             newModes.push(mode);
@@ -93,11 +104,13 @@ export default {
       router.push({ name: "Match", params: {} });
     }
 
-    return { store, totalTimer, onStartAgain, auth };
+    return { store, totalTimer, isFirework, onStartAgain, auth };
   },
 };
 </script>
-
+<style lang="scss" scoped>
+@import "@/assets/styles/fireworks.scss";
+</style>
 <style scoped>
 .screen button {
   transition: background 0.3s ease-in-out;

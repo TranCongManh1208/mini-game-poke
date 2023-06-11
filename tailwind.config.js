@@ -9,6 +9,7 @@ module.exports = {
       'light': '#f3f3f3',
       'dark': '#212121',
       'CornflowerBlue': '#6495ED',
+      'red': '#FF0000',
     },
     fontFamily: {
       sans: ['Odibee Sans', 'cursive'],
